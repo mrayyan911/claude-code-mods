@@ -2,7 +2,7 @@
 
 Mods for [Claude Code](https://docs.claude.com/en/docs/claude-code).
 
-## handoff-button
+## rayyan-handoff-button
 
 A **Handoff** button above the prompt. One click writes a single `HANDOFF.md` in the project root by running two handoff skills together:
 
@@ -18,7 +18,7 @@ Also available as a command: `/handoff-all [what the next session is for]`.
 Type this at the Claude Code prompt:
 
 ```
-/plugin install handoff-button --marketplace mrayyan911/claude-code-mods
+/plugin install rayyan-handoff-button --marketplace mrayyan911/claude-code-mods
 ```
 
 Answer `y` to add the marketplace, then pick a scope (user scope makes it available in every session).

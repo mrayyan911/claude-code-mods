@@ -3,6 +3,6 @@ export type Phase = 'idle' | 'running' | 'done'
 
 declare module 'claude-code' {
   interface PluginState {
-    'handoff-button': { phase: Phase }
+    'rayyan-handoff-button': { phase: Phase }
   }
 }

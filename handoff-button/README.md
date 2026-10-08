@@ -1,4 +1,4 @@
-# handoff-button
+# rayyan-handoff-button
 
 A **Handoff** button above the Claude Code prompt. One click writes a single `HANDOFF.md` in your project root, so a fresh session can pick up exactly where this one left off.
 

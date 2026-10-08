@@ -4,7 +4,7 @@
   "owner": { "name": "Muhammad Rayyan", "url": "https://github.com/mrayyan911" },
   "plugins": [
     {
-      "name": "handoff-button",
+      "name": "rayyan-handoff-button",
       "source": "./handoff-button",
       "description": "One-click handoff: runs mattpocock-skills:handoff and claude-mem:handoff together into a single HANDOFF.md"
     }

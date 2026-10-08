@@ -5,7 +5,7 @@ const MATT = 'mattpocock-skills:handoff'
 const MEM = 'claude-mem:handoff'
 const RESUME = 'Read HANDOFF.md and continue from where we left off.'
 
-const phase = atom({ plugin: 'handoff-button', key: 'phase' } as const, 'idle')
+const phase = atom({ plugin: 'rayyan-handoff-button', key: 'phase' } as const, 'idle')
 
 // The next turn to start after a click is the handoff's (a command queued
 // behind a running turn waits for it), and only its end marks the band done.

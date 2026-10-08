@@ -7,7 +7,7 @@ const BAND = {
 
 test('the band shows a Handoff button on every surface that has one', async $ => {
   for (const surface of ['terminal', 'desktop'] as const) {
-    const ui = await $.ui.mount({ plugin: 'handoff-button', surface, ...BAND } as never)
+    const ui = await $.ui.mount({ plugin: 'rayyan-handoff-button', surface, ...BAND } as never)
     expect(await ui.find({ key: 'handoff' })).toBeDefined()
     await ui.unmount()
   }
@@ -29,7 +29,7 @@ test('one click runs mattpocock handoff with claude-mem folded in', async ($, on
     return { text: '' }
   })
 
-  const ui = await $.ui.mount({ plugin: 'handoff-button', surface: 'terminal', ...BAND } as never)
+  const ui = await $.ui.mount({ plugin: 'rayyan-handoff-button', surface: 'terminal', ...BAND } as never)
   await ui.press({ key: 'handoff' })
 
   expect(runs.length).toBe(1)
