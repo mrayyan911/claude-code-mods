@@ -1,6 +1,6 @@
 {
   "name": "rayyan-handoff-button",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "One-click handoff: runs mattpocock-skills:handoff and claude-mem:handoff together into a single HANDOFF.md",
   "author": { "name": "Muhammad Rayyan", "url": "https://github.com/mrayyan911" },
   "repository": "https://github.com/mrayyan911/claude-code-mods",
