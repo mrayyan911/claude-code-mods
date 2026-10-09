@@ -18,10 +18,11 @@ Also available as a command: `/handoff-all [what the next session is for]`.
 Type this at the Claude Code prompt:
 
 ```
-/plugin install rayyan-handoff-button --marketplace mrayyan911/claude-code-mods
+/plugin marketplace add mrayyan911/claude-code-mods
+/plugin install rayyan-handoff-button@rayyan-mods
 ```
 
-Answer `y` to add the marketplace, then pick a scope (user scope makes it available in every session).
+The marketplace is named `rayyan-mods`, so it doesn't clash with other `claude-code-mods` marketplaces. Pick a scope when asked (user scope makes it available in every session).
 
 ### Requirements
 
