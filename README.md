@@ -35,6 +35,14 @@ If only one is installed, the button runs that one alone and tells you so.
 
 `HANDOFF.md` is a scratch file: delete it after the new session has read it, or add it to `.gitignore`.
 
+## rename-session-mod
+
+Names each session after the work done in it when the session ends: on exit, `/clear`, or a switch with `/resume`. A session you named with `/rename` keeps its name, and a session you open and leave without working keeps its name too. See [its README](rename-session-mod/README.md) for how it works.
+
+```
+/plugin install rename-session-mod --marketplace mrayyan911/claude-code-mods
+```
+
 ## License
 
 MIT

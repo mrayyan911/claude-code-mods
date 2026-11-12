@@ -1,0 +1,8 @@
+{
+  "name": "rename-session-mod",
+  "version": "0.1.0",
+  "description": "Names a session after a summary of its work when it ends (exit or /clear), and only when work happened since the last rename.",
+  "author": { "name": "Muhammad Rayyan", "url": "https://github.com/mrayyan911" },
+  "repository": "https://github.com/mrayyan911/claude-code-mods",
+  "license": "MIT"
+}

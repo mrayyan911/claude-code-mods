@@ -7,6 +7,11 @@
       "name": "rayyan-handoff-button",
       "source": "./rayyan-handoff-button",
       "description": "One-click handoff: runs mattpocock-skills:handoff and claude-mem:handoff together into a single HANDOFF.md"
+    },
+    {
+      "name": "rename-session-mod",
+      "source": "./rename-session-mod",
+      "description": "Names a session after its work when it ends (exit or /clear), and keeps any name you set with /rename"
     }
   ]
 }
