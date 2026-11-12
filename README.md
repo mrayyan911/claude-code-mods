@@ -43,6 +43,14 @@ Names each session after the work done in it when the session ends: on exit, `/c
 /plugin install rename-session-mod --marketplace mrayyan911/claude-code-mods
 ```
 
+## cache-tax
+
+A fork of Karan Bansal's [cache-tax](https://github.com/karanb192/cache-tax) 2.2.1, the mod that keeps the one-hour prompt cache warm and stops a cold send once with its price. The original handles `/clear` and resume on `classic.SessionStart`. Where `cc-plugin-sec-default` sends that event past user-tier mods, the original never sees either. The fork handles `/clear` on `session.end` and has a `SessionStart` command hook save the resume fields for the module. See [its README](cache-tax/README.md). Disable the original if it is installed.
+
+```
+/plugin install cache-tax --marketplace mrayyan911/claude-code-mods
+```
+
 ## License
 
 MIT

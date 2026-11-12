@@ -1,0 +1,9 @@
+{
+  "description": "cache-tax (Mod): session.start, session.end, command.run{command=keepwarm|cache-tax}, prompt.submit, turn.step, turn.complete, session.compact, plus a SessionStart command hook that saves resume fields. Needs CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1; builds without function hooks ignore the modules key.",
+  "modules": [
+    "./register.ts"
+  ],
+  "hooks": {
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/start-fields.cjs\"" }] }]
+  }
+}
