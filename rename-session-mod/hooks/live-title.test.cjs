@@ -55,3 +55,29 @@ test('bad stdin exits 0 with no output', () => {
   assert.equal(out.stdout.length, 0)
   fs.rmSync(dir, { recursive: true, force: true })
 })
+
+test('a session id alone deletes the saved title, and deleting twice is fine', () => {
+  const { dir, run } = setup([])
+  run(['s1', 'Fix login bug'])
+  assert.equal(run(['s1']).status, 0)
+  assert.equal(run(['s1']).status, 0)
+  assert.equal(run([], hook('UserPromptSubmit')).stdout.length, 0)
+  assert.equal(fs.existsSync(path.join(dir, 'rename-session-mod', 's1.txt')), false)
+  fs.rmSync(dir, { recursive: true, force: true })
+})
+
+test('a resume with no saved title takes the last title the transcript holds', () => {
+  const { dir, run } = setup([
+    { type: 'custom-title', customTitle: 'Old title', sessionId: 's1' },
+    { type: 'custom-title', customTitle: 'Fix login bug', sessionId: 's1' },
+  ])
+  const resume = JSON.stringify({ session_id: 's1', hook_event_name: 'SessionStart', source: 'resume' })
+  assert.deepEqual(JSON.parse(run([], resume).stdout), {
+    hookSpecificOutput: { hookEventName: 'SessionStart', sessionTitle: 'Fix login bug' },
+  })
+  // Only a resume falls back: /clear carries the previous session's title into the new transcript.
+  const clear = JSON.stringify({ session_id: 's1', hook_event_name: 'SessionStart', source: 'clear' })
+  assert.equal(run([], clear).stdout.length, 0)
+  assert.equal(run([], hook('UserPromptSubmit')).stdout.length, 0)
+  fs.rmSync(dir, { recursive: true, force: true })
+})

@@ -18,15 +18,15 @@ The mod needs `node` on `PATH`.
 ## How a session gets its name
 
 1. After each of your turns, Haiku reads the session and writes a title of 3 to 7 words. The call runs in the background, so the turn does not wait for it. Turns that subagents run do not count.
-2. The title is saved to `<tmp dir>/rename-session-mod/<session id>.txt`. On your next prompt, and when a session starts or resumes, a command hook in `hooks/live-title.cjs` reads that file and sets it as the session's name. Claude Code then writes the name to the transcript itself.
-3. When the session ends, the mod appends two lines to the session's transcript, `~/.claude/projects/<project>/<session id>.jsonl`:
+2. The title is saved to `<tmp dir>/rename-session-mod/<session id>.txt`. On your next prompt, a command hook in `hooks/live-title.cjs` reads that file and sets it as the session's name. Claude Code then writes the name to the transcript itself.
+3. When the session ends, the mod deletes the title file and appends two lines to the session's transcript, `~/.claude/projects/<project>/<session id>.jsonl`:
 
 	```json
 	{"type":"custom-title","customTitle":"Fix login bug","sessionId":"<session id>"}
 	{"type":"agent-name","agentName":"Fix login bug","sessionId":"<session id>"}
 	```
 
-	`/rename` writes the same two lines, so `/resume` shows the name the same way.
+	`/rename` writes the same two lines, so `/resume` shows the name the same way. When you resume the session, the command hook finds no title file and sets the last `custom-title` in the transcript as the name.
 
 Haiku gets each message cut to 500 characters, without system reminders or slash-command echoes such as `/clear`. If the session text is longer than 24,000 characters, Haiku gets the first quarter and the last three quarters of that budget, so it sees the opening ask and the latest work.
 
@@ -86,7 +86,7 @@ To see what the mod did in a session, start Claude Code with `claude --debug`. T
 ## Limits
 
 - The live name is one turn behind. The first titled turn sets the name on your next prompt, and each later title shows one prompt after it was written.
-- A hooks module cannot set the name, so the live name comes from the command hook. Title files stay in the tmp dir until the OS clears it.
+- A hooks module cannot set the name, so the live name comes from the command hook. A title file is deleted when its session ends. If Claude Code is killed instead of exiting, the file stays in the tmp dir until the OS clears it.
 - If you exit within about a second of a reply, the title for that last turn may not be ready. The session then keeps the previous turn's title, or gets no new name if it was the first turn.
 - If the mod reloads during a session, it forgets the turns that ran before the reload.
 - The mod only detects names you set with `/rename`. A name set any other way can be overwritten.

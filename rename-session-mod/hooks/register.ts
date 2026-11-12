@@ -62,6 +62,25 @@ const titleSession = async ($: EngineInterface, id: string, entry: Pending, turn
   $.ui.log(`rename-session-mod: ${id} -> ${title}`, { to: 'debug' })
 }
 
+// The live name now lives in the transcript, so the title file has no further use.
+const forgetTitle = ($: EngineInterface, id: string) =>
+  $.process.run(['node', `${$.plugin.root}/hooks/live-title.cjs`, id], { timeoutMs: 1000 })
+
+const appendTitle = async ($: EngineInterface, id: string, entry: Pending) => {
+  if (entry.isRenamed || entry.title === undefined) return
+  // The same two rows /rename writes, so the name shows on resume.
+  const line = [
+    { type: 'custom-title', customTitle: entry.title, sessionId: id },
+    { type: 'agent-name', agentName: entry.title, sessionId: id },
+  ]
+    .map(row => JSON.stringify(row))
+    .join('\n')
+  // The script checks for /rename once more: one run after the last turn is not seen above.
+  const run = await $.process.run(['node', script($), id, line], { timeoutMs: 1000 })
+  if (run.exitCode === RENAMED) $.ui.log(`rename-session-mod: kept the /rename name of ${id}`, { to: 'debug' })
+  else if (run.exitCode !== 0) $.ui.log(`rename-session-mod: append failed: ${run.stderr}`, { to: 'debug' })
+}
+
 export const register: Register = on => {
   // A main-loop turn is the work. Not classic.Stop: the built-in security plugin sends classic.* past user mods.
   on('turn.complete', async ($, e, next) => {
@@ -82,22 +101,14 @@ export const register: Register = on => {
     const ended = await next(e)
     const entry = pending.get(e.sessionId)
     pending.delete(e.sessionId)
-    if (entry === undefined || entry.isRenamed) return ended
-    // A title still being written for the last turn gets what the exit's budget leaves, less room for the append.
-    const waitMs = Math.min(1000, next.budget.remainingMs - 300)
-    if (waitMs > 0) await Promise.race([entry.job, $.clock.sleep(waitMs)])
-    if (entry.title === undefined) return ended
-    // The same two rows /rename writes, so the name shows on resume.
-    const line = [
-      { type: 'custom-title', customTitle: entry.title, sessionId: e.sessionId },
-      { type: 'agent-name', agentName: entry.title, sessionId: e.sessionId },
-    ]
-      .map(row => JSON.stringify(row))
-      .join('\n')
-    // The script checks for /rename once more: one run after the last turn is not seen above.
-    const run = await $.process.run(['node', script($), e.sessionId, line], { timeoutMs: 1000 })
-    if (run.exitCode === RENAMED) $.ui.log(`rename-session-mod: kept the /rename name of ${e.sessionId}`, { to: 'debug' })
-    else if (run.exitCode !== 0) $.ui.log(`rename-session-mod: append failed: ${run.stderr}`, { to: 'debug' })
+    if (entry === undefined) return ended
+    if (!entry.isRenamed) {
+      // A title still being written for the last turn gets what the exit's budget leaves, less room for the append.
+      const waitMs = Math.min(1000, next.budget.remainingMs - 300)
+      if (waitMs > 0) await Promise.race([entry.job, $.clock.sleep(waitMs)])
+    }
+    // Run side by side: the end's budget has room for one script run, not two in a row.
+    await Promise.all([appendTitle($, e.sessionId, entry), forgetTitle($, e.sessionId)])
     return ended
   })
 }
