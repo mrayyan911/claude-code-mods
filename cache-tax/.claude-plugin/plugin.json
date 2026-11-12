@@ -1,9 +1,0 @@
-{
-  "name": "cache-tax",
-  "version": "2.2.1",
-  "description": "Fork of cache-tax 2.2.1 by Karan Bansal: keeps the one-hour prompt cache warm during breaks and stops a cold send once with its estimated rewrite cost, and still handles /clear and resume where classic.SessionStart is bypassed. Warming uses model requests and costs tokens. Requires Claude Code 2.1.287+.",
-  "author": {
-    "name": "Karan Bansal"
-  },
-  "license": "MIT"
-}

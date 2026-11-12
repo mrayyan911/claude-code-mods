@@ -17,11 +17,6 @@
       "name": "next-steps-sticky",
       "source": "./next-steps-sticky",
       "description": "next-steps, but the suggestions stay up after you pick one: click another to replace the draft"
-    },
-    {
-      "name": "cache-tax",
-      "source": "./cache-tax",
-      "description": "Fork of Karan Bansal's cache-tax 2.2.1 (keeps the prompt cache warm, stops a cold send once with its price) that still handles /clear and resume where classic.SessionStart is bypassed"
     }
   ]
 }
