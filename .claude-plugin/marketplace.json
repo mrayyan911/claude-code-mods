@@ -12,6 +12,11 @@
       "name": "rename-session-mod",
       "source": "./rename-session-mod",
       "description": "Names a session after its work when it ends (exit or /clear), and keeps any name you set with /rename"
+    },
+    {
+      "name": "next-steps-sticky",
+      "source": "./next-steps-sticky",
+      "description": "next-steps, but the suggestions stay up after you pick one: click another to replace the draft"
     }
   ]
 }
