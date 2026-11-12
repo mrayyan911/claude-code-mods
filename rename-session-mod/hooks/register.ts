@@ -43,6 +43,9 @@ const summarize = async ($: EngineInterface) => {
 
 // The hooks module has no fs append, and $.fs.write would rewrite the whole transcript.
 const script = ($: EngineInterface) => `${$.plugin.root}/hooks/append-title.cjs`
+// live-title.cjs owns the title file's path, so the module needs no tmpdir.
+const saveTitle = ($: EngineInterface, id: string, title: string) =>
+  $.process.run(['node', `${$.plugin.root}/hooks/live-title.cjs`, id, title], { timeoutMs: 2000 })
 
 const wasRenamed = async ($: EngineInterface, id: string) =>
   (await $.process.run(['node', script($), id], { timeoutMs: 5000 })).exitCode === RENAMED
@@ -55,6 +58,7 @@ const titleSession = async ($: EngineInterface, id: string, entry: Pending, turn
   if (title === undefined || turn < entry.titledTurn) return
   entry.title = title
   entry.titledTurn = turn
+  await saveTitle($, id, title)
   $.ui.log(`rename-session-mod: ${id} -> ${title}`, { to: 'debug' })
 }
 
@@ -83,7 +87,13 @@ export const register: Register = on => {
     const waitMs = Math.min(1000, next.budget.remainingMs - 300)
     if (waitMs > 0) await Promise.race([entry.job, $.clock.sleep(waitMs)])
     if (entry.title === undefined) return ended
-    const line = JSON.stringify({ type: 'custom-title', customTitle: entry.title, sessionId: e.sessionId })
+    // The same two rows /rename writes, so the name shows on resume.
+    const line = [
+      { type: 'custom-title', customTitle: entry.title, sessionId: e.sessionId },
+      { type: 'agent-name', agentName: entry.title, sessionId: e.sessionId },
+    ]
+      .map(row => JSON.stringify(row))
+      .join('\n')
     // The script checks for /rename once more: one run after the last turn is not seen above.
     const run = await $.process.run(['node', script($), e.sessionId, line], { timeoutMs: 1000 })
     if (run.exitCode === RENAMED) $.ui.log(`rename-session-mod: kept the /rename name of ${e.sessionId}`, { to: 'debug' })

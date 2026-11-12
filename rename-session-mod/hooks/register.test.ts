@@ -8,7 +8,7 @@ const END = { reason: 'prompt_input_exit', sessionId: 's1', resume: { id: 's1' }
 
 // Stands in for the engine; append-title.cjs answers `renamedExit` to a check (no title argument).
 const engine = (on: On, sessionId: string, renamedExit: number) => {
-  const seen = { appended: [] as unknown[], titleCalls: 0 }
+  const seen = { appended: [] as unknown[], saved: [] as unknown[], titleCalls: 0 }
   on('session.id', () => ({ value: sessionId }))
   on('session.messages', () => ({ value: [{ role: 'user', text: 'fix the login bug', toolUses: [] }] }))
   on('model.complete', () => {
@@ -23,8 +23,10 @@ const engine = (on: On, sessionId: string, renamedExit: number) => {
   })
   on('process.run', (_, e) => {
     const line = e.argv[3]
-    if (line !== undefined) seen.appended.push({ id: e.argv[2], line: JSON.parse(line) })
-    const exitCode = line === undefined ? renamedExit : 0
+    const isSave = e.argv[1]?.endsWith('live-title.cjs') === true
+    if (isSave) seen.saved.push({ id: e.argv[2], title: line })
+    else if (line !== undefined) seen.appended.push({ id: e.argv[2], rows: line.split('\n').map(row => JSON.parse(row)) })
+    const exitCode = line === undefined && !isSave ? renamedExit : 0
     return { value: { exitCode, stdout: '', stderr: '', isStdoutTruncated: false, isStderrTruncated: false } }
   })
   on('session.end', (_, e) => ({ sessionId: e.sessionId }))
@@ -49,10 +51,11 @@ test('a session named with /rename gets no title call and no title', async ($, o
 
   expect(seen.titleCalls).toBe(0)
   expect(seen.appended).toEqual([])
+  expect(seen.saved).toEqual([])
 })
 
 test('a session is renamed at its end only when it had work since the last rename', async ($, on) => {
-  const { appended } = engine(on, 's1', 0)
+  const { appended, saved } = engine(on, 's1', 0)
 
   // Revisiting with no work: nothing written.
   await $.session.end(END)
@@ -66,8 +69,15 @@ test('a session is renamed at its end only when it had work since the last renam
   await $.turn.complete(TURN)
   await settle()
   await $.session.end(END)
+  expect(saved).toEqual([{ id: 's1', title: 'Fix login bug' }])
   expect(appended).toEqual([
-    { id: 's1', line: { type: 'custom-title', customTitle: 'Fix login bug', sessionId: 's1' } },
+    {
+      id: 's1',
+      rows: [
+        { type: 'custom-title', customTitle: 'Fix login bug', sessionId: 's1' },
+        { type: 'agent-name', agentName: 'Fix login bug', sessionId: 's1' },
+      ],
+    },
   ])
 
   // Ended again with no new turn: not renamed again.
